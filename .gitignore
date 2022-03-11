@@ -22,3 +22,4 @@ var/
 
 # Jupyter
 .ipynb_checkpoints
+*.ipynb

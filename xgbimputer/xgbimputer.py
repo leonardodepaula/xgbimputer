@@ -16,15 +16,65 @@ from .utils import encode_categories, get_inferred_categories_index, replace_cat
 __all__ = ['XGBImputer']
 
 class XGBImputer(BaseEstimator, TransformerMixin):
+
+    '''
+    XGBImputer is an effort to implement the concepts of the MissForest
+    algorithm proposed by Daniel J. Stekhoven and Peter Bühlmann in 2012,
+    but leveraging the robustness and predictive power of the XGBoost
+    algorithm released in 2014. It also aims to simplify the process of
+    imputing categorical values in a scikit-learn compatible way.
+
+    Parameters
+    ----------
+
+    categorical_features_index : List[int], np.array[int], optional (default = [])
+        List or array of integers representing the index of categorical
+        features of the array being imputed.If no index of categorical 
+        feature is informed, the algorithm will treat all features as numerical.
+    
+    replace_categorical_values_back : bool, optional (default = False)
+        If set to True, the values of the imputed X will be replaced with
+        the initial categories back again. Otherwise, the categorical features
+        will be OrdinalEncoded and the imputed X will be a numpy array
+        containing only floats.
+    
+    **kwargs:
+        Any keyword argument provided will be treated as XGBoost parameters
+        to be set.
+
+    Attributes
+    ----------
+
+    encoded_categories : dict
+        Dictionary containing all column indexes of categorical features
+        and the respective OrdinalEncoded values used by the algorithm.
+    
+    casted_as_string_categories : dict
+        Dictionary containing all column indexes of categorical featues
+        that needed to be casted as string to be processed.
+        
+        By default, the sklearn's OrdinalEncoder cannot operate on arrays that
+        contains both floats and strings. Verifying this condition, XGBImputer
+        will treat all values of the specific feature as strings to be OrdinalEncoded.
+
+        If the parameter 'replace_categorical_values_back' is set to True, the feature's
+        dtype will be casted again to 'object' and the numeric like values will be casted
+        as floats when possible.
+    '''
     
     def __init__(
         self,
         categorical_features_index=[],
-        replace_categorical_values_back=False
+        replace_categorical_values_back=False,
+        **kwargs
     ):
         
         self.categorical_features_index = np.array(categorical_features_index)
         self.replace_categorical_values_back = replace_categorical_values_back
+        if kwargs:
+            self.kwargs = kwargs
+        else:
+            self.kwargs = {}
     
     def fit(self, X, y=None):
         
@@ -71,6 +121,9 @@ class XGBImputer(BaseEstimator, TransformerMixin):
                     xgb = XGBClassifier(subsample=0.7, use_label_encoder=False, verbosity=0)
                 else:
                     xgb = XGBRegressor(subsample=0.7, verbosity=0)
+                
+                if self.kwargs:
+                    xgb.set_params(**self.kwargs)
 
                 X_obs = np.delete(Ximp, column_index, axis=1)[np.invert(self.isnan_array[:,column_index]),:]
                 y_obs = Ximp[np.invert(self.isnan_array[:,column_index]),column_index]
