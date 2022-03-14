@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
 
 setup(
     name='xgbimputer',
-    version='0.1.0',
+    version='0.2.0',
     author='Leonardo de Paula Liebscher',
     author_email='<leonardopx@gmail.com>',
     description='Extreme Gradient Boosting imputer for Machine Learning.',
