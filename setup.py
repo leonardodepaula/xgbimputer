@@ -13,7 +13,7 @@ setup(
     long_description=long_description,
     url='https://github.com/leonardodepaula/xgbimputer',
     packages=find_packages(),
-    install_requires=['numpy>=1.21.5', 'scikit-learn>=1.0.2', 'xgboost>=1.5.2'],
+    install_requires=['numpy>=1.21', 'scikit-learn>=1.0', 'xgboost>=1.5'],
     keywords=['python', 'machine learning', 'missing values', 'imputation'],
     classifiers=[
       'Intended Audience :: Science/Research',

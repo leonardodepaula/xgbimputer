@@ -78,6 +78,13 @@ class XGBImputer(BaseEstimator, TransformerMixin):
     
     def fit(self, X, y=None):
         
+        return self
+    
+    def transform(self, X):
+
+        if type(X) != np.ndarray:
+            X = np.array(X)
+
         self.columns_index = np.arange(X.shape[1])
         X, self.encoded_categories, self.casted_as_string_categories = encode_categories(X, self.categorical_features_index)
 
@@ -94,10 +101,6 @@ class XGBImputer(BaseEstimator, TransformerMixin):
         
         mode_simple_imputer = SimpleImputer(strategy='most_frequent')
         X[:,self.categorical_features_index] = mode_simple_imputer.fit_transform(X[:,self.categorical_features_index])
-        
-        return self
-    
-    def transform(self, X):
         
         Ximp = X.copy()
         
